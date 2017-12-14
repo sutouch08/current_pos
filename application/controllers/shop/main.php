@@ -1,4 +1,4 @@
-<?php 
+<?php
 	class Main extends CI_Controller
 	{
 		public $id_menu = 4;
@@ -6,15 +6,15 @@
 		public $layout = "include/template";
 		public $title = "POS";
 		public $bill_header;
-		
+
 		public function __construct()
 		{
-			parent:: __construct();	
+			parent:: __construct();
 			$this->load->model("shop/main_model");
 			$this->home = base_url()."shop/main";
 			$this->load->model("admin/promotion_model");
 		}
-		
+
 		public function index()
 		{
 			$rs = $this->main_model->check_open_order(id_employee());
@@ -23,11 +23,11 @@
 				$rd 				= $rs[0];
 				$data['detail']	= $this->main_model->get_detail($rd->id_order);
 				$data['order']	= $rs;
-				
+
 			}
 			else
 			{
-				$data['reference'] = new_reference();	
+				$data['reference'] = new_reference();
 				$data['id_employee'] = id_employee();
 				$rs = $this->main_model->new_order($data);
 				if($rs)
@@ -36,13 +36,13 @@
 					$data['order'] = $rs;
 				}
 			}
-							
+
 			$data['id_menu'] 		= $this->id_menu;
 			$data['view'] 			= "shop/main_view";
 			$data['page_title'] 		= $this->title;
-			$this->load->view($this->layout, $data);	
+			$this->load->view($this->layout, $data);
 		}
-		
+
 		public function sell($id_order)
 		{
 			$data['order']		= $this->main_model->get_data($id_order);
@@ -50,26 +50,26 @@
 			$data['id_menu'] 	= $this->id_menu;
 			$data['view'] 		= "shop/main_view";
 			$data['page_title'] 	= $this->title;
-			$this->load->view($this->layout, $data);		
+			$this->load->view($this->layout, $data);
 		}
-		
-		
+
+
 public function add_item($id_order)
 {
 	if($this->input->post("barcode"))
 	{
-		
+
 		$reference 		= $this->main_model->get_reference($id_order);
 		$barcode 		= trim($this->input->post("barcode"));
 		$a_dis 			= trim($this->input->post("discount_amount"));
 		$p_dis			= trim($this->input->post("discount_percent"));
 		$qty 				= trim($this->input->post("qty"));
 		$item	 			= $this->main_model->get_item($barcode);
-		
+
 		if( $item )// $item
 		{
 			///  กรณีมีการให้ส่วนลดโดยคนขายเองที่หน้าจอ
-			if( $p_dis != 0 || $a_dis != 0) 
+			if( $p_dis != 0 || $a_dis != 0)
 			{
 				$id_promo = 0;
 				$de = $this->main_model->isExistsDetail($id_order, $barcode, $p_dis, $a_dis, $id_promo);  //// ถ้ามีรายการอยู่แล้ว จะได้ข้อมูลแถวนั้นกลับมา ถ้าไม่มีจะได้ค่า false;
@@ -77,10 +77,9 @@ public function add_item($id_order)
 				{
 					$qty = $qty + $de->qty;
 					$price = $de->final_price;
-					$discount = $de->discount_percent > 0 ? $price * ($de->discount_percent * 0.01) : $de->discount_amount;
+					$discount = $de->discount_percent > 0 ? $de->price * ($de->discount_percent * 0.01) : $de->discount_amount;
 					$total_discount = $qty * $discount;
 					$total_amount = $qty * $price;
-					
 					$data = array("qty" => $qty, "total_discount" => $total_discount, "total_amount" => $total_amount);
 					$rd = $this->main_model->update_detail($de->id_order_detail, $data);
 					if( $rd )
@@ -95,16 +94,16 @@ public function add_item($id_order)
 										<td align="center">'. discount($ds->discount_percent, $ds->discount_amount).'</td>
 										<td align="right" class="amount">'.number_format($rd->total_amount,2).'</td>
 										<td align="center"><button type="button" class="btn btn-danger btn-minier" onClick="delete_row('.$ds->id_order_detail.')"><i class="fa fa-trash"></i></button></td>';
-										
-							$datax = "update || ".$ds->id_order_detail." || ".$data;	
-							echo $datax;	
+
+							$datax = "update || ".$ds->id_order_detail." || ".$data;
+							echo $datax;
 					}// $rd
 					else
 					{
 						echo "fail 1";
 					}
 				} // $de
-				
+
 				else    // $de
 				/// ถ้าไม่มีรายการอยู่ เพิ่มใหม่
 				{
@@ -142,15 +141,15 @@ public function add_item($id_order)
 									"price"		=> number_format($ds->price,2),
 									"discount" 	=> discount($p_dis, $a_dis),
 									"amount"		=> number_format($total_amount, 2)
-									);		
-						$datax = "insert || ".json_encode($data);	
+									);
+						$datax = "insert || ".json_encode($data);
 						echo $datax;
 					}
 					else
 					{
 						echo "fail 2";
 					}
-				}// $de 
+				}// $de
 			} //  $p_dis != 0
 			/// จบ กรณีการให้ส่วนลดที่หน้าจอ
 			///  กรณีที่ไม่มีการให้ส่วนลดที่หน้าจอ ทำการตรวจสอบโปรโมชั่น
@@ -165,10 +164,10 @@ public function add_item($id_order)
 					{
 						$qty 		= $qty + $de->qty;
 						$price 	= $de->final_price;
-						$discount	= $de->discount_percent > 0 ? $price * ($de->discount_percent * 0.01) : $de->discount_amount;
+						$discount	= $de->discount_percent > 0 ? $de->price * ($de->discount_percent * 0.01) : $de->discount_amount;
 						$total_discount = $qty * $discount;
 						$total_amount = $qty * $price;
-						
+
 						$data = array("qty" => $qty, "total_discount" => $total_discount, "total_amount" => $total_amount);
 						$rd = $this->main_model->update_detail($de->id_order_detail, $data);
 						if( $rd )
@@ -183,13 +182,13 @@ public function add_item($id_order)
 										<td align="center">'. discount($ds->discount_percent, $ds->discount_amount).'</td>
 										<td align="right" class="amount">'.number_format($ds->total_amount,2).'</td>
 										<td align="center"><button type="button" class="btn btn-danger btn-minier" onClick="delete_row('.$ds->id_order_detail.')"><i class="fa fa-trash"></i></button></td>';
-										
-							$datax = "update || ".$ds->id_order_detail." || ".$data;	
-							echo $datax;			
+
+							$datax = "update || ".$ds->id_order_detail." || ".$data;
+							echo $datax;
 						}
 						else
 						{
-							echo "fail 3";	
+							echo "fail 3";
 						}
 					}
 					else
@@ -229,8 +228,8 @@ public function add_item($id_order)
 										"price"		=> number_format($ds->price,2),
 										"discount" 	=> discount($pd->percent, $pd->amount),
 										"amount"		=> number_format($total_amount, 2)
-										);		
-							$datax = "insert || ".json_encode($data);	
+										);
+							$datax = "insert || ".json_encode($data);
 							echo $datax;
 						}
 						else
@@ -238,9 +237,9 @@ public function add_item($id_order)
 							echo "fail 4";
 						}
 					}
-					
+
 				}
-				else /// ไม่มีโปร ไม่มีส่วนลดใดๆ 
+				else /// ไม่มีโปร ไม่มีส่วนลดใดๆ
 				{
 					$id_promo = 0;
 					/// ตรวจสอบว่ามีรายการก่อนหน้าอยู่หรือป่าว
@@ -252,7 +251,7 @@ public function add_item($id_order)
 						$discount = $de->discount_percent > 0 ? $price * ($de->discount_percent * 0.01) : $de->discount_amount;
 						$total_discount = $qty * $discount;
 						$total_amount = $qty * $price;
-						
+
 						$data = array("qty" => $qty, "total_discount" => $total_discount, "total_amount" => $total_amount);
 						$rd = $this->main_model->update_detail($de->id_order_detail, $data);
 						if( $rd )
@@ -267,16 +266,16 @@ public function add_item($id_order)
 										<td align="center">'. discount($ds->discount_percent, $ds->discount_amount).'</td>
 										<td align="right" class="amount">'.number_format($ds->total_amount,2).'</td>
 										<td align="center"><button type="button" class="btn btn-danger btn-minier" onClick="delete_row('.$ds->id_order_detail.')"><i class="fa fa-trash"></i></button></td>';
-										
-							$datax = "update || ".$ds->id_order_detail." || ".$data;	
-							echo $datax;			
+
+							$datax = "update || ".$ds->id_order_detail." || ".$data;
+							echo $datax;
 						}
 						else
 						{
-							echo "fail 3";	
+							echo "fail 3";
 						}
 					}
-					else  
+					else
 					{
 						$price 			= $item->price;
 						$final_price 		= $price;
@@ -312,15 +311,15 @@ public function add_item($id_order)
 										"price"		=> number_format($ds->price,2),
 										"discount" 	=> '0.00',
 										"amount"		=> number_format($total_amount, 2)
-										);		
-							$datax = "insert || ".json_encode($data);	
+										);
+							$datax = "insert || ".json_encode($data);
 							echo $datax;
 						}
 						else
 						{
 							echo "fail 4";
 						}
-					}//  nopromo	
+					}//  nopromo
 				}
 			}// $p_dis != 0
 		}
@@ -332,12 +331,12 @@ public function add_item($id_order)
 	}
 	else
 	{
-		echo "nobarcode";	
+		echo "nobarcode";
 	}
 }
 
 
-		
+
 		public function delete_item()
 		{
 			if($this->input->post("id_order_detail"))
@@ -353,20 +352,20 @@ public function add_item($id_order)
 				}
 			}
 		}
-		
+
 		public function payment($id_order)
 		{
 			$total_amount 	= $this->input->post("total_amount");
 			$received 		= $this->input->post("received");
 			$pay_by			= $this->input->post('payment_method');
 			$sc 				= TRUE;
-			/// start transection 
+			/// start transection
 			$this->db->trans_begin();
-					
+
 			// เปลี่ยนสถานะเป็นชำระแล้ว
 			$valid = $this->main_model->valid_detail($id_order, 1);
 			if( !$valid ){ 	$sc = FALSE; }
-			
+
 			$order 	= $this->main_model->get_order($id_order);
 			$rs 		= $this->main_model->get_detail($id_order);
 			$data = array(
@@ -393,8 +392,8 @@ public function add_item($id_order)
 				echo 'fail';
 			}
 		}
-				
-		
+
+
 		public function print_order($id_order)
 		{
 			$order 			= $this->main_model->get_order($id_order);
@@ -403,9 +402,9 @@ public function add_item($id_order)
 			$rd['order']		= $order;
 			$rd['payment'] 	= $this->main_model->get_payment($id_order);
 			$rd['bill_header']	= $this->main_model->get_bill_header();
-			$this->load->view("shop/bill_view", $rd);			
+			$this->load->view("shop/bill_view", $rd);
 		}
 	}/// endclass
-	
+
 
 ?>

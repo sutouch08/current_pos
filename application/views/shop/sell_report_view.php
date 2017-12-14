@@ -19,23 +19,32 @@
 <div id="tab1" class="tab-pane active">
 <form id="form" action="<?php echo $this->home; ?>/export_report" method="post">
 <div class="row">
-<div class="col-lg-2 col-md-4 col-sm-6">	
+<div class="col-lg-2 col-md-4 col-sm-6">
 	<label>เริ่มต้น</label>
-	<input type="text" id="from_date" name="from_date" class="form-control input-sm" /> 
+	<input type="text" id="from_date" name="from_date" class="form-control input-sm" />
 </div>
-<div class="col-lg-2 col-md-4 col-sm-6">	
+<div class="col-lg-2 col-md-4 col-sm-6">
 	<label>สิ้นสุด</label>
-	<input type="text" id="to_date" name="to_date" class="form-control input-sm" /> 
+	<input type="text" id="to_date" name="to_date" class="form-control input-sm" />
 </div>
-<div class="col-lg-2 col-md-4 col-sm-6">	
+<div class="col-lg-2 col-md-4 col-sm-6">
+	<label style="display:block; visibility:hidden">OnlyMe</label>
+	<button type="button" class="btn btn-xs btn-primary" id="btn-all" onclick="reportAll()"><i class="fa fa-check"></i> ทั้งหมด</button>
+	<button type="button" class="btn btn-xs" id="btn-me" onclick="reportMe()">เฉพาะฉัน</button>
+
+</div>
+<div class="col-lg-2 col-md-4 col-sm-6">
 	<label style="visibility:hidden; display:block;">report</label>
 	<button type="button" class="btn btn-info btn-xs btn-block" id="btn_report" onclick="get_report()"><i class="fa fa-bar-chart-o"></i> รายงาน</button>
 </div>
-<div class="col-lg-2 col-md-4 col-sm-6">	
+<div class="col-lg-2 col-md-4 col-sm-6">
 	<label style="visibility:hidden; display:block;">export</label>
 	<button type="button" class="btn btn-success btn-xs btn-block" onclick="export_report()"><i class="fa fa-file-excel-o"></i> ส่งออก</button>
 </div>
 </div><!--/ Row -->
+
+<input type="hidden" name="onlyMe" id="onlyMe" value="0" />
+<input type="hidden" name="id_employee" id="id_employee" value="<?php echo $this->session->userdata('id_employee'); ?>" />
 </form>
 </div><!--/ tab1 -->
 </div><!-- tab content -->
@@ -57,7 +66,7 @@
     <th style="width:5%; text-align:center">ส่วนลด</th>
     <th style="width:5%; text-align:center">จำนวน</th>
     <th style="width:10%; text-align:center">มูลค่า</th>
-	<th style="width:5%; text-align:center">การชำระ</th>	
+	<th style="width:5%; text-align:center">การชำระ</th>
     <th style="width:10%; text-align:center">วันที่</th>
 	<th style="width:10%; text-align:center">รุ่น</th>
 	<th style="width:10%; text-align:center">กลุ่ม</th>
@@ -71,8 +80,8 @@
         <td align="center">{{ qty }}</td>
         <td align="center">{{ total_amount }}</td>
 		<td colspan="5" align="center"></td>
-    </tr>	
-	
+    </tr>
+
 	{{else}}
 <tr style="font-size:10px;">
     	<td>{{ reference }}</td>
@@ -88,7 +97,7 @@
 		<td align="center">{{ emp }}</td>
     </tr>
 	{{/if}}
-{{/each}}	
+{{/each}}
 </table>
 </script>
 <script>
@@ -98,6 +107,8 @@ function get_report()
 {
 	var from = $("#from_date").val();
 	var to = $("#to_date").val();
+	var me = $('#onlyMe').val();
+	var emp = $('#id_employee').val();
 	if(!isDate(from) || !isDate(to) )
 	{
 		swal("วันที่ไม่ถูกต้อง");
@@ -106,7 +117,15 @@ function get_report()
 	load_in();
 	$.ajax({
 		url:"<?php echo $this->home; ?>/get_report",
-		type:"POST", cache: false, data:{ "from_date" : from, "to_date" : to },
+		type:"POST",
+		cache: false,
+		data:
+		{
+			"from_date" : from,
+			"to_date" : to ,
+			"onlyMe" : me,
+			"id_employee" : emp
+		},
 		 success: function(rs)
 		{
 			load_out();
@@ -118,7 +137,7 @@ function get_report()
 				var template 	= Handlebars.compile(source);
 				var row 			= template(data);
 				var output		= $("#rs");
-				render(source, data, output);	
+				render(source, data, output);
 			}
 			else
 			{
@@ -139,6 +158,23 @@ function export_report()
 	}
 	$("#form").submit();
 }
+
+function reportAll(){
+	$('#btn-me').removeClass('btn-primary');
+	$('#btn-me').html('เฉพาะฉัน');
+	$('#btn-all').addClass('btn-primary');
+	$('#btn-all').html('<i class="fa fa-check"></i> ทั้งหมด');
+	$('#onlyMe').val(0);
+}
+
+function reportMe(){
+	$('#btn-all').removeClass('btn-primary');
+	$('#btn-all').html('ทั้งหมด');
+	$('#btn-me').addClass('btn-primary');
+	$('#btn-me').html('<i class="fa fa-check"></i> เฉพาะฉัน');
+	$('#onlyMe').val(1);
+}
+
 </script>
 
 <?php endif; ?>

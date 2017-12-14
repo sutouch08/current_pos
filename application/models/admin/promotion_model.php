@@ -1,10 +1,10 @@
-<?php 
+<?php
 class Promotion_model extends CI_Model
 {
 
 public function __construct()
 {
-	parent:: __construct();	
+	parent:: __construct();
 }
 
 public function add_promotion($data)
@@ -12,7 +12,7 @@ public function add_promotion($data)
 	$rs = $this->db->insert('tbl_promotion', $data);
 	if( $rs )
 	{
-		$id = $this->db->insert_id();	
+		$id = $this->db->insert_id();
 		return $this->get_promotion($id);
 	}
 	else
@@ -52,19 +52,21 @@ public function isPromotion($barcode)
 	$this->db->select('id_promotion, set_price, percent, amount')->join('tbl_promotion', 'tbl_promotion.id = tbl_promotion_items.id_promotion');
 	$this->db->where('barcode', $barcode)->where('start_date <=', fromDate(date('Y-m-d')))->where('end_date >=', toDate(date('Y-m-d')))->where('active', 1);
 	$rs = $this->db->order_by('tbl_promotion_items.id_promotion', 'desc')->get('tbl_promotion_items');
-	
+
 	if( $rs->num_rows() > 0 )
 	{
-		return $rs->row();	
+		return $rs->row();
 	}
 	else
 	{
 		return FALSE;
 	}
 }
+
+
 public function isExists($barcode, $id_promo)
 {
-	$rs = $this->db->where('barcode', $barcode)->where('id_promotion', $id_promo)->get('tbl_promotion_items');	
+	$rs = $this->db->where('barcode', $barcode)->where('id_promotion', $id_promo)->get('tbl_promotion_items');
 	if( $rs->num_rows() == 0 )
 	{
 		return FALSE;
@@ -77,7 +79,7 @@ public function isExists($barcode, $id_promo)
 
 public function addPromotionItem($data)
 {
-	return $this->db->insert('tbl_promotion_items', $data);	
+	return $this->db->insert('tbl_promotion_items', $data);
 }
 
 	public function count_row($txt = "")
@@ -96,7 +98,7 @@ public function addPromotionItem($data)
 			return false;
 		}
 	}
-	
+
 	public function count_style_row($txt = "")
 	{
 		if( $txt != "" )
@@ -109,9 +111,9 @@ public function addPromotionItem($data)
 		}else{
 			return false;
 		}
-		
+
 	}
-	
+
 	public function search_count_row($txt)
 	{
 		$this->db->like("code", $txt)->or_like("promo_name", $txt);
@@ -142,7 +144,7 @@ public function addPromotionItem($data)
 			}
 		}
 	}
-	
+
 	public function get_search_data($txt, $perpage="", $limit ="")
 	{
 		$this->db->like("code", $txt)->or_like("promo_name", $txt);
@@ -153,12 +155,12 @@ public function addPromotionItem($data)
 				return false;
 			}
 	}
-	
+
 public function deleteImported($id)
 {
-	return $this->db->where('id_promotion', $id)->delete('tbl_promotion_items');	
+	return $this->db->where('id_promotion', $id)->delete('tbl_promotion_items');
 }
-	
+
 }/// End class
 
 ?>
