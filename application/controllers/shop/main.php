@@ -15,7 +15,17 @@
 			$this->load->model("admin/promotion_model");
 		}
 
+
 		public function index()
+		{
+			$data['id_menu'] 		= $this->id_menu;
+			$data['view'] 			= "shop/main_view";
+			$data['page_title'] 		= $this->title;
+			$this->load->view($this->layout, $data);
+		}
+
+
+		public function new_order()
 		{
 			$rs = $this->main_model->check_open_order(id_employee());
 			if($rs)
@@ -39,9 +49,11 @@
 
 			$data['id_menu'] 		= $this->id_menu;
 			$data['view'] 			= "shop/main_view";
-			$data['page_title'] 		= $this->title;
+			$data['page_title'] = $this->title;
+			$data['new_order']	= TRUE;
 			$this->load->view($this->layout, $data);
 		}
+
 
 		public function sell($id_order)
 		{
@@ -359,38 +371,69 @@ public function add_item($id_order)
 			$received 		= $this->input->post("received");
 			$pay_by			= $this->input->post('payment_method');
 			$sc 				= TRUE;
+
 			/// start transection
 			$this->db->trans_begin();
 
-			// เปลี่ยนสถานะเป็นชำระแล้ว
-			$valid = $this->main_model->valid_detail($id_order, 1);
-			if( !$valid ){ 	$sc = FALSE; }
+			//---	ตรวจสอบก่อนว่ามีการชำระเงินไปแล้วหรือยัง
+			$paid = $this->main_model->isPaid($id_order);
 
-			$order 	= $this->main_model->get_order($id_order);
-			$rs 		= $this->main_model->get_detail($id_order);
-			$data = array(
-							"id_order" 		=> $order->id_order,
-							"reference" 		=> $order->reference,
-							"order_amount" => $total_amount,
-							"discount"		=> $this->main_model->get_total_discount($id_order),
-							"received" 		=> $received,
-							"changed" 		=> $received - $total_amount,
-							"id_employee" 	=> id_employee(),
-							"pay_by"			=> $pay_by
-							);
-			$payment = $this->main_model->add_payment($data);
-			if(!$payment){ $sc = FALSE; }
-			if( !$this->main_model->change_status($id_order, 1)){ $sc = FALSE; }
+			if( $paid === TRUE )
+			{
+				$sc = FALSE;
+				$message = 'บิลนี้มีการชำระเงินไปแล้ว';
+			}
+			else
+			{
+				$order 	= $this->main_model->get_order($id_order);
+				$rs 		= $this->main_model->get_detail($id_order);
+
+				//---	ข้อมูลสำหรับบันทึกการชำระเงิน
+				$data = array(
+								"id_order" 		=> $order->id_order,
+								"reference" 		=> $order->reference,
+								"order_amount" => $total_amount,
+								"discount"		=> $this->main_model->get_total_discount($id_order),
+								"received" 		=> $received,
+								"changed" 		=> $received - $total_amount,
+								"id_employee" 	=> id_employee(),
+								"pay_by"			=> $pay_by
+								);
+
+				//---	บันทึกชำระเงิน
+				if($this->main_model->add_payment($data) !== TRUE)
+				{
+					$sc = FALSE;
+					$message = 'บันทึกชำระเงินไม่สำเร็จ';
+				}
+
+				// เปลี่ยนสถานะรายการซื้อเป็นชำระแล้ว
+				if($this->main_model->valid_detail($id_order, 1) !== TRUE)
+				{
+					$sc = FALSE;
+					$message = 'เปลี่ยนสถานะรายการสินค้าไม่สำเร็จ';
+				}
+
+				//---- เปลี่ยนสถานะออเดอร์เป็นบันทึกแล้ว
+				if($this->main_model->change_status($id_order, 1) !== TRUE)
+				{
+					$sc = FALSE;
+					$message = 'บันทึกสถานะออเดอร์ไม่สำเร็จ';
+				}
+
+			}
+
+
 			if( $sc === TRUE )
 			{
 				$this->db->trans_commit();
-				echo 'success';
 			}
 			else
 			{
 				$this->db->trans_rollback();
-				echo 'fail';
 			}
+
+			echo $sc === TRUE ? 'success' : $message;
 		}
 
 

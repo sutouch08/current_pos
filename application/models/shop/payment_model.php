@@ -3,9 +3,9 @@ class Payment_model extends CI_Model
 {
 	public function __construct()
 	{
-		parent:: __construct();	
+		parent:: __construct();
 	}
-	
+
 	public function count_row($txt = "")
 	{
 		if($txt != "")
@@ -43,7 +43,7 @@ class Payment_model extends CI_Model
 			}
 		}
 	}
-	
+
 	public function get_search_data($txt, $perpage="", $limit ="")
 	{
 		$this->db->like("reference", $txt);
@@ -54,4 +54,6 @@ class Payment_model extends CI_Model
 				return false;
 			}
 	}
-}/// end class
+
+
+	}/// end class

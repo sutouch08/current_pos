@@ -1,32 +1,32 @@
 <?php
 class Main_model extends CI_Model
 {
-	
+
 	public function __construct()
 	{
 		parent:: __construct();
 	}
-	
+
 	public function change_status($id_order, $status = 1)
 	{
 		$rs = $this->db->where("id_order", $id_order)->update("tbl_order", array("status"=>1));
 		return $rs;
 	}
-	
+
 	public function get_bill_header()
 	{
 		$rs = "SELECT value FROM tbl_config WHERE config_name = 'BILL_HEADER'";
 		$rs = $this->db->query($rs);
-		return $rs->row()->value;	
+		return $rs->row()->value;
 	}
-	
-	
+
+
 	public function add_payment($data)
 	{
 		$rs = $this->db->insert("tbl_payment", $data);
 		return $rs;
 	}
-	
+
 	public function payment_list($id_employee = "")
 	{
 		if($id_employee != "")
@@ -46,7 +46,7 @@ class Main_model extends CI_Model
 			return false;
 		}
 	}
-	
+
 	public function check_status($id_order)
 	{
 		$rs = $this->db->select("status")->where("id_order", $id_order)->get("tbl_order");
@@ -59,24 +59,28 @@ class Main_model extends CI_Model
 			return false;
 		}
 	}
-	
+
 	public function get_payment($id_order)
 	{
 		$rs = $this->db->where("id_order", $id_order)->get("tbl_payment");
 		if($rs->num_rows() == 1)
 		{
-			return $rs->row();	
+			return $rs->row();
 		}
 		else
 		{
-			return $rs->num_rows();
+			$sc = new stdClass();
+			$sc->received = 0.00;
+			$sc->changed = 0.00;
+			$sc->pay_by = '';
+			return $sc;
 		}
 	}
-	
+
 	public function get_total_discount($id_order)
 	{
 		$rs = $this->db->select_sum("total_discount")->where("id_order", $id_order)->get("tbl_order_detail");
-		return $rs->row()->total_discount;	
+		return $rs->row()->total_discount;
 	}
 	public function add_detail($data)
 	{
@@ -90,11 +94,11 @@ class Main_model extends CI_Model
 			return FALSE;
 		}
 	}
-	
+
 	public function update_detail($id, $data)
 	{
 		$rs = $this->db->where("id_order_detail", $id)->update("tbl_order_detail", $data);
-		return $rs;	
+		return $rs;
 	}
 	public function new_order($data)
 	{
@@ -108,7 +112,7 @@ class Main_model extends CI_Model
 			return false;
 		}
 	}
-	
+
 	public function get_data($id)
 	{
 		$rs = $this->db->where("id_order", $id)->get("tbl_order");
@@ -119,7 +123,7 @@ class Main_model extends CI_Model
 		$rs = $this->db->where("id_order", $id)->get("tbl_order");
 		return $rs->row();
 	}
-	
+
 	public function get_item($barcode)
 	{
 		$rs = $this->db->where("barcode", $barcode)->get("tbl_items");
@@ -132,25 +136,25 @@ class Main_model extends CI_Model
 			return false;
 		}
 	}
-	
+
 	public function delete_item($id_order_detail)
 	{
 		$rs = $this->db->where("id_order_detail", $id_order_detail)->delete("tbl_order_detail");
-		return $rs;	
+		return $rs;
 	}
-	
+
 	public function get_total_order($id_order)
 	{
 		$rs = $this->db->select_sum("total_amount")->where("id_order", $id_order)->get("tbl_order_detail");
-		return $rs->row()->total_amount;	
+		return $rs->row()->total_amount;
 	}
-	
+
 	public function valid_detail($id_order, $valid = 1)
 	{
 		$rs = $this->db->where("id_order", $id_order)->update("tbl_order_detail", array("valid"=>1));
 		return $rs;
 	}
-	
+
 	public function get_reference($id_order)
 	{
 		$rs = $this->db->select("reference")->where("id_order", $id_order)->get("tbl_order");
@@ -163,7 +167,7 @@ class Main_model extends CI_Model
 			return 0;
 		}
 	}
-	
+
 	public function get_detail_data($id_order, $barcode)
 	{
 		$rs = $this->db->where("id_order", $id_order)->where("barcode", $barcode)->get("tbl_order_detail");
@@ -176,7 +180,7 @@ class Main_model extends CI_Model
 			return false;
 		}
 	}
-	
+
 	public function check_open_order($id_employee)
 	{
 		$rs = $this->db->where("id_employee", $id_employee)->where("status", 0)->get("tbl_order");
@@ -189,7 +193,7 @@ class Main_model extends CI_Model
 			return false;
 		}
 	}
-	
+
 	public function get_detail($id_order)
 	{
 		$rs = $this->db->where("id_order", $id_order)->get("tbl_order_detail");
@@ -202,10 +206,10 @@ class Main_model extends CI_Model
 			return false;
 		}
 	}
-	
+
 	public function isExistsDetail($id_order, $barcode, $p_dis, $a_dis, $id_promo)
 	{
-		$rs = $this->db->where('id_order', $id_order)->where('barcode', $barcode)->where('discount_percent', $p_dis)->where('discount_amount', $a_dis)->where('id_promotion', $id_promo)->get('tbl_order_detail');	
+		$rs = $this->db->where('id_order', $id_order)->where('barcode', $barcode)->where('discount_percent', $p_dis)->where('discount_amount', $a_dis)->where('id_promotion', $id_promo)->get('tbl_order_detail');
 		if( $rs->num_rows() == 0 )
 		{
 			return FALSE;
@@ -215,7 +219,7 @@ class Main_model extends CI_Model
 			return $rs->row();
 		}
 	}
-	
+
 	public function getDetailRow($id, $barcode)
 	{
 		$rs = $this->db->where("id_order_detail", $id)->where('barcode', $barcode)->get('tbl_order_detail');
@@ -228,12 +232,25 @@ class Main_model extends CI_Model
 			return false;
 		}
 	}
-	
+
 	public function getIdOrder($id_order_detail)
 	{
 		$rs = $this->db->where('id_order_detail', $id_order_detail)->get('tbl_order_detail');
-		return $rs->row()->id_order;	
+		return $rs->row()->id_order;
 	}
-	
+
+
+	public function isPaid($id_order)
+	{
+		$sc = FALSE;
+		$rs = $this->db->where('id_order', $id_order)->get('tbl_payment');
+		if($rs->num_rows() > 0)
+		{
+			$sc = TRUE;
+		}
+
+		return $sc;
+	}
+
 }/// end class
 ?>

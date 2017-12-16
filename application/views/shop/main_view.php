@@ -1,3 +1,20 @@
+<?php if(! isset($new_order)) : ?>
+	<button type="button" class="btn btn-lg btn-success" onclick="new_order()"><i class="fa fa-plus"></i> ขายสินค้า [ Space ]</button>
+	<script>
+		function new_order(){
+			window.location.href = '<?php echo $this->home.'/new_order'; ?>';
+		}
+
+		$(document).ready(function() {
+			$(document).keyup(function(e) {
+				if(e.keyCode == 32){
+					new_order();
+				}
+			});
+		});
+
+	</script>
+<?php else : ?>
 <script src="<?php echo base_url(); ?>assets/js/jquery.slimscroll.js"></script>
 <?php if(isset($order)) : ?>
 <?php   foreach($order as $rs) : ?>
@@ -8,7 +25,7 @@
 <div class="col-lg-9">
 	<!-- #section:custom/widget-box -->
 	<div class="widget-box ">
-		<div class="widget-header widget-header-large" style="padding: 15px;">	
+		<div class="widget-header widget-header-large" style="padding: 15px;">
         	<div class="row" style="margin-top:10px;">
         		<div class="col-lg-4">
                 	<div class="input-group">
@@ -16,10 +33,10 @@
                     <input type="text" class="form-control input-sm" value="0.00" id="discount_percent" name="discount_percent" style="text-align:center;" />
                     <span class="input-group-addon" style="padding-left:5px; padding-right:5px;">%</span>
                     <input type="text" class="form-control input-sm" value="0.00" id="discount_amount" name="discount_amount" style="text-align:center;" />
-                    <span class="input-group-addon" style="padding-left:5px; padding-right:5px;">฿</span>                    
+                    <span class="input-group-addon" style="padding-left:5px; padding-right:5px;">฿</span>
                 	</div>
                 </div>
-                
+
                 <div class="col-lg-3">
                     <div class="input-group">
                     	<span class="input-group-addon" style="padding-left:5px; padding-right:5px;">จำนวน</span>
@@ -30,7 +47,7 @@
                         </span>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-5">
                 	<div class="input-group">
                 	<span class="input-group-addon" style="padding-left:5px; padding-right:5px;">ยิงบาร์โค้ด</span>
@@ -39,10 +56,10 @@
                     	<button type="button" class="btn btn-xs btn-primary" id="btn_add" onClick="add_item()"><i class="fa fa-bolt"></i> เพิ่มรายการ</button>
                      </span>
                 	</div>
-                </div>     	
-            
+                </div>
+
             </div>
-        							
+
 		</div>
 		<div class="widget-body">
         <div class="widget-main" style="padding:0px;">
@@ -60,7 +77,7 @@
             </tr>
             </table>
             </div>
-            
+
 			<div class="widget-main" id="items_box" style="min-height:500px; padding:0px;">
             <table class="table table-striped" style="margin-bottom:0px;">
             <tbody id="rs">
@@ -82,21 +99,21 @@
         <?php $total_qty += $rd->qty; $total_amount += $rd->total_amount; $i++; $n++; ?>
         <?php endforeach; ?>
     <?php endif; ?>
-            	
-            </tbody>            
+
+            </tbody>
             </table>
-            	
+
 			</div>
 		</div>
 	</div>
-	<!-- /section:custom/widget-box -->	
+	<!-- /section:custom/widget-box -->
 </div>
 
 <div class="col-lg-3">
 <form id="payment_form" action="<?php echo $this->home; ?>/payment/<?php echo $rs->id_order; ?>" method="post">
 	<!-- #section:custom/widget-box -->
 	<div class="widget-box ">
-		<div class="widget-header">	
+		<div class="widget-header">
         	<h5 class="widget-title"><center><?php echo $rs->reference; ?></center></h5>
 		</div>
 		<div class="widget-body">
@@ -127,7 +144,7 @@
 			</div>
 		</div>
 	</div>
-	<!-- /section:custom/widget-box -->	
+	<!-- /section:custom/widget-box -->
 </div>
 </form>
 </div>
@@ -225,7 +242,7 @@ function cal_change()
 	if(change > 0)
 	{
 		change = addCommas(change);
-		$("#change").text(change);	
+		$("#change").text(change);
 		$("#change_amount").val(change);
 	}
 	else
@@ -251,7 +268,7 @@ function totalRows()
 	var rows = 0;
 	$(".no").each(function(index, element) {
         rows += 1;
-    });	
+    });
 	return rows;
 }
 function totalQty()
@@ -262,7 +279,7 @@ function totalQty()
 		if( !isNaN(qty) ){
 			qtys += qty;
 		}
-    });	
+    });
 	return qtys;
 }
 
@@ -274,7 +291,7 @@ function totalAmount()
 		if( !isNaN(amount) ){
 			amounts += amount;
 		}
-    });	
+    });
 	return amounts.toFixed(2);
 }
 
@@ -284,7 +301,7 @@ function reorder()
 	$(".no").each(function(index, element) {
         $(this).text(i);
 		i++;
-    });	
+    });
 }
 
 function save()
@@ -295,11 +312,17 @@ function save()
 	var payment_method = $("input[name=payment_method]:checked").val();
 	if(isNaN(received)){ swal("กรุณาระบุยอดเงินที่รับมา");  return false; }
 	if(received < total_amount){	swal("รับเงินมาน้อยกว่ายอดที่ต้องชำระ");	return false; 	}
-	
+
 	load_in();
 	$.ajax({
 		url:"<?php echo $this->home; ?>/payment/"+id_order,
-		type:"POST", cache:"false", data:{ "total_amount" : total_amount, "received" : received, "payment_method" : payment_method },
+		type:"POST",
+		cache:"false",
+		data:{
+			"total_amount" : total_amount,
+			"received" : received,
+			"payment_method" : payment_method
+		},
 		success: function(rs){
 			load_out();
 			var rs = $.trim(rs);
@@ -308,11 +331,18 @@ function save()
 				window.open('<?php echo $this->home; ?>/print_order/'+id_order, '_blank', 'width=400, height=600, left='+center+', scrollbars=yes');
 				window.location.href = '<?php echo $this->home; ?>';
 			}else{
-				swal('ชำระเงินไม่สำเร็จ', 'การชำระเงินไม่สำเร็จกรุณาลองใหม่อีกครั้ง', 'error');
+				swal({
+					title:'Error !',
+					text: rs,
+					type:'error'
+				});
+
 			}
 		}
-	});	
+	});
 }
+
+
 function add_item()
 {
 	var id						= $("#id_order").val();
@@ -329,7 +359,7 @@ function add_item()
 	$("#discount_amount").val('0.00');
 	$("#qty").val(1);
 	$("#barcode").val('');
-	
+
 	load_in();
 	$.ajax({
 		url:"<?php echo $this->home; ?>/add_item/"+id,
@@ -347,7 +377,7 @@ function add_item()
 					recal();
 					reorder();
 					$("#barcode").focus();
-					
+
 				}else if( arr[0] == "insert"){
 					var source = $("#row").html();
 					var data = $.parseJSON(arr[1]);
@@ -359,7 +389,7 @@ function add_item()
 				}
 			}
 		}
-	});	
+	});
 }
 function delete_row(id)
 {
@@ -374,10 +404,10 @@ function delete_row(id)
 		  closeOnConfirm: true
 		},
 		function(isConfirm){
-		  if (isConfirm) 
+		  if (isConfirm)
 		  {
 			delete_item(id);
-		  } 
+		  }
 		});
 }
 
@@ -387,7 +417,7 @@ function delete_item(id)
 	load_in();
 	$.ajax({
 		url:"<?php echo $this->home; ?>/delete_item", type: "POST", cache: "false",
-		data:{ "id_order_detail" : id }, 
+		data:{ "id_order_detail" : id },
 		success: function(rs)
 		{
 			load_out();
@@ -403,24 +433,24 @@ function delete_item(id)
 				swal({ title: "ผิดพลาด", text: "ไม่สามารถลบรายการได้ กรุณาลองใหม่อีกครั้ง", type: "error"});
 			}
 		}
-	});			
+	});
 }
 
 function increse()
 {
 	var qty = parseInt($("#qty").val());
-	if(isNaN(qty)){ 
-		qty = 1; 
+	if(isNaN(qty)){
+		qty = 1;
 	}else{
 		qty += 1;
 	}
-	$("#qty").val(qty)	
+	$("#qty").val(qty)
 }
 function decrese()
 {
 	var qty = parseInt($("#qty").val());
-	if(isNaN(qty)){ 
-		qty = 1; 
+	if(isNaN(qty)){
+		qty = 1;
 	}else{
 		if( qty > 1 ){
 			qty = qty - 1;
@@ -449,3 +479,4 @@ $(function(){
 
 
 </script>
+<?php endif; ?>
