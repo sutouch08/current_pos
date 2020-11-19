@@ -50,8 +50,8 @@ $active_record = TRUE;
 
 $db['default']['hostname'] = 'localhost';
 $db['default']['username'] = 'root';
-$db['default']['password'] = 'warrix';
-$db['default']['database'] = 'samba_pos';
+$db['default']['password'] = 'ZT20o15u21c3H808';
+$db['default']['database'] = 'current_pos';
 $db['default']['dbdriver'] = 'mysqli';
 $db['default']['dbprefix'] = '';
 $db['default']['pconnect'] = TRUE;

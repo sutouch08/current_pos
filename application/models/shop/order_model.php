@@ -3,8 +3,10 @@ class Order_model extends CI_Model
 {
 	public function __construct()
 	{
-		parent:: __construct();	
+		parent:: __construct();
 	}
+
+
 	
 	public function get_data($id="", $perpage="", $limit ="")
 	{
@@ -25,7 +27,10 @@ class Order_model extends CI_Model
 			}
 		}
 	}
-	
+
+
+
+
 	public function get_search_data($txt, $perpage="", $limit ="")
 	{
 		$this->db->like("item_code", $txt)->or_like("item_name", $txt)->or_like("style", $txt)->or_like("barcode", $txt);
@@ -36,9 +41,9 @@ class Order_model extends CI_Model
 				return false;
 			}
 	}
-	
-	
-	
+
+
+
 }// End class
 
 ?>

@@ -1,9 +1,12 @@
 <?php
+
 function setError($message)
 {
 	$c =& get_instance();
 	$c->session->set_flashdata("error", $message);
 }
+
+
 
 function setMessage($message)
 {
@@ -11,11 +14,17 @@ function setMessage($message)
 	$c->session->set_flashdata("success", $message);
 }
 
+
+
+
 function setInfo($message)
 {
 	$c =& get_instance();
 	$c->session->set_flashdata("info", $message);
 }
+
+
+
 
 function isActived($value)
 {
@@ -26,6 +35,10 @@ function isActived($value)
 	}
 	return $icon;
 }
+
+
+
+
 
 function is_active_btn($value, $active)
 {
@@ -41,6 +54,10 @@ function is_active_btn($value, $active)
 	}
 }
 
+
+
+
+
 function isChecked($val1, $val2)
 {
 	$value = "";
@@ -51,6 +68,10 @@ function isChecked($val1, $val2)
 	return $value;
 }
 
+
+
+
+
 function isSelected($val1, $val2)
 {
 	$value = "";
@@ -60,6 +81,9 @@ function isSelected($val1, $val2)
 	}
 	return $value;
 }
+
+
+
 
 function selectColorGroup($id = "")
 {
@@ -81,6 +105,9 @@ function selectColorGroup($id = "")
 	return $option;
 }
 
+
+
+
 function selectColor($id="")
 {
 	$c =& get_instance();
@@ -95,8 +122,12 @@ function selectColor($id="")
 			$option .= "<option value='".$ro->id_color."' ".$select." >".$ro->color_code." : ".$ro->color_name."</option>";
 		}
 	}
-	return $option;	
+	return $option;
 }
+
+
+
+
 
 function selectSize($id="")
 {
@@ -116,6 +147,11 @@ function selectSize($id="")
 	return $option;
 }
 
+
+
+
+
+
 function selectAttribute($id="")
 {
 	$c =& get_instance();
@@ -134,6 +170,10 @@ function selectAttribute($id="")
 	return $option;
 }
 
+
+
+
+
 function selectCategory($id="")
 {
 	$c =& get_instance();
@@ -151,6 +191,10 @@ function selectCategory($id="")
 	return $option;
 }
 
+
+
+
+
 function getColorGroup($id)
 {
 	$c =& get_instance();
@@ -163,7 +207,7 @@ function getColorGroup($id)
 		return $value;
 	}
 }
-	
+
 
 function getParentCategoryName($id_parent)
 {
@@ -198,7 +242,7 @@ function getEmployeeNameByIdUser($id_user)
 	{
 		$name = $rs->row()->first_name;
 	}
-	return $name;	
+	return $name;
 }
 
 function getCategoryById($id_category)
@@ -229,6 +273,9 @@ function category_product_check($id_category, $category_product="")
 		return $checked;
 }
 
+
+
+
 function image_path($id_image, $use_size=1)
 {
 	switch($use_size)
@@ -251,8 +298,8 @@ function image_path($id_image, $use_size=1)
 	}
 	$image_path = base_url()."images/product";
 	if($id_image == "")
-	{ 
-		$id_image = "no_image_"; 
+	{
+		$id_image = "no_image_";
 		return $image_path."/".$id_image.$prefix.".jpg";
 	}else{
 		$count = strlen($id_image);
@@ -287,12 +334,12 @@ function get_cover_image($id_product, $use_size=1)
 		$prefix = "default";
 		break;
 	}
-	$image = base_url()."images/product/no_image_".$prefix.".jpg"; 
+	$image = base_url()."images/product/no_image_".$prefix.".jpg";
 	$c =& get_instance();
 	$rs = $c->db->select("id_image")->where("id_product", $id_product)->where("cover", 1)->get("tbl_image");
 	if($rs->num_rows() == 1)
 	{
-		$image = image_path($rs->row()->id_image, $use_size);	
+		$image = image_path($rs->row()->id_image, $use_size);
 	}
 	return $image;
 }
@@ -318,7 +365,7 @@ function product_attribute_image($id_product_attribute, $use_size=1)
 		$prefix = "default";
 		break;
 	}
-	$image = base_url()."images/product/no_image_".$prefix.".jpg";	
+	$image = base_url()."images/product/no_image_".$prefix.".jpg";
 	$c =& get_instance();
 	$rs = $c->db->select("id_image")->where("id_product_attribute", $id_product_attribute)->get("tbl_product_attribute_image");
 	if($rs->num_rows() >0)
@@ -415,6 +462,8 @@ function get_product_code($id_product)
 	return $code;
 }
 
+
+
 function new_reference($date = "")
 {
 	$c =& get_instance();
@@ -429,12 +478,15 @@ function new_reference($date = "")
 		$ra = explode('-', $str, 2);
 		$num = $ra[1];
 		$run_num = $num + 1;
-		$reference = $prefix."-".$run_num;		
+		$reference = $prefix."-".$run_num;
 	}else{
 		$reference = $prefix."-".$year.$month."00001";
 	}
-	return $reference;		
+	return $reference;
 }
+
+
+
 
 function new_promotion_code($date = "")
 {
@@ -450,12 +502,15 @@ function new_promotion_code($date = "")
 		$ra = explode('-', $str, 2);
 		$num = $ra[1];
 		$run_num = $num + 1;
-		$reference = $prefix."-".$run_num;		
+		$reference = $prefix."-".$run_num;
 	}else{
 		$reference = $prefix."-".$year.$month."00001";
 	}
-	return $reference;		
+	return $reference;
 }
+
+
+
 
 function brandName($id_b)
 {
@@ -467,6 +522,11 @@ function brandName($id_b)
 	}
 	return $name;
 }
+
+
+
+
+
 function getIdBrandByBarcode($barcode)
 {
 	$rs = get_instance()->db->select('id_brand')->where('barcode', $barcode)->get('tbl_items');

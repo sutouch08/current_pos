@@ -62,6 +62,7 @@
 
 		</div>
 		<div class="widget-body">
+			<!--
         <div class="widget-main" style="padding:0px;">
          <table class="table table-striped" style="margin-bottom:0px;">
             <tr style="font-size:12px;">
@@ -77,9 +78,22 @@
             </tr>
             </table>
             </div>
-
+					-->
 			<div class="widget-main" id="items_box" style="min-height:500px; padding:0px;">
             <table class="table table-striped" style="margin-bottom:0px;">
+							<thead>
+								<tr style="font-size:12px;">
+		            	<th style="width: 5%; text-align:center;">No.</th>
+		                <th style="width: 10%;">Barcode</th>
+		                <th style="width: 15%;">Items</th>
+		                <th style="width: 25%;">Detail</th>
+		                <th style="width: 5%; text-align:center;">Qty.</th>
+		                <th style="width: 10%; text-align:center;">Price</th>
+		                <th style="width: 10%; text-align:center;">Discount</th>
+		                <th style="width: 15%; text-align:right;">Amount.</th>
+		                <th style="width: 5%; text-align:center;"></th>
+		            </tr>
+							</thead>
             <tbody id="rs">
      <?php $i = 0; $n = 1; $total_amount = 0.00; $total_qty = 0.00; ?>
 	<?php if( isset($detail) && $detail != false ) : ?>
